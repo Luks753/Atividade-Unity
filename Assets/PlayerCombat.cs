@@ -15,14 +15,15 @@ public class PlayerCombat : MonoBehaviour
     public float deathTime;
     public int maxHealth = 100;
     int currentHealth;
+    Rigidbody2D rb;
     
     void Start()
     {
+        rb = GetComponent<Rigidbody2D>();
         currentHealth = maxHealth;
         getDeathTime();
     }
 
-    // Update is called once per frame
     void Update()
     {
 
@@ -39,7 +40,7 @@ public class PlayerCombat : MonoBehaviour
         Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, attackRange, enemyLayers);
 
         foreach(Collider2D enemy in hitEnemies){
-            enemy.GetComponent<Enemy>().TakeDamage(attackDamage);
+            enemy.GetComponent<Enemy>().TakeDamage(attackDamage, attackPoint.position);
         }
     }
 
@@ -55,6 +56,7 @@ public class PlayerCombat : MonoBehaviour
         currentHealth -= damage;
         animator.SetTrigger("hit");
         if(currentHealth <= 0){
+            rb.constraints = RigidbodyConstraints2D.FreezeAll;
             Die();
         }
     }

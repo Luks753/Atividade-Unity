@@ -17,9 +17,11 @@ public class EnemyIA : MonoBehaviour
     Seeker seeker;
     Rigidbody2D rb;
     public Transform enemy;
-    // Start is called before the first frame update
+    public bool isBoss;
+
     void Start()
     {
+        target = GameObject.Find("Player").transform;
         seeker = GetComponent<Seeker>();
         rb = GetComponent<Rigidbody2D>();
         InvokeRepeating("UpdatePath", 0f, .5f);
@@ -39,7 +41,6 @@ public class EnemyIA : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
     void FixedUpdate()
     {
         if(path == null){
@@ -53,6 +54,7 @@ public class EnemyIA : MonoBehaviour
         }
 
         Vector2 direction = ((Vector2)path.vectorPath[currentWaypoint] - rb.position).normalized;
+
         Vector2 force = direction * speed * Time.deltaTime;
 
         rb.AddForce(force);
@@ -63,10 +65,19 @@ public class EnemyIA : MonoBehaviour
             currentWaypoint++;
         }
 
-        if(rb.velocity.x >= 0.01f){
-            enemy.localScale = new Vector3(-1f,1f,1f);
-        }else if(rb.velocity.x <= 0.01f){
-            enemy.localScale = new Vector3(1f,1f,1f);
+        if(isBoss){
+            if(rb.velocity.x >= 0.01f){
+                enemy.localScale = new Vector3(-1.5f,1.5f,1.5f);
+            }else if(rb.velocity.x <= 0.01f){
+                enemy.localScale = new Vector3(1.5f,1.5f,1.5f);
+            }
+        }else{
+            if(rb.velocity.x >= 0.01f){
+                enemy.localScale = new Vector3(-1f,1f,1f);
+            }else if(rb.velocity.x <= 0.01f){
+                enemy.localScale = new Vector3(1f,1f,1f);
         }
+        }
+        
     }
 }

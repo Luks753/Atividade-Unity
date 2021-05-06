@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class Enemy : MonoBehaviour
 {
@@ -13,24 +15,24 @@ public class Enemy : MonoBehaviour
     public float attackRate = 2f;
     float nextAttack = 0f;
 
+    Rigidbody2D rb;
     public Animator animator;
     public float deathTime;
 
     public int maxHealth = 100;
     int currentHealth;
+    public bool isBoss;
 
     void Start()
     {
+        rb = GetComponent<Rigidbody2D>();
         currentHealth = maxHealth;
         getDeathTime();
     }
 
     void Update()
     {
-        if(Time.time >= nextAttack){
-            Attack();
-            nextAttack = Time.time + 1f / attackRate;
-        }
+        Attack();
     }
 
     public void getDeathTime()
@@ -44,19 +46,19 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    public void TakeDamage(int damage){
+    public void TakeDamage(int damage, Vector2 attack){
         currentHealth -= damage;
         animator.SetTrigger("hit");
         if(currentHealth <= 0){
+            rb.constraints = RigidbodyConstraints2D.FreezeAll;
             Die();
-        }
+        }   
     }
 
     void Attack(){
         Collider2D[] hitPlayer = Physics2D.OverlapCircleAll(attackPoint.position, attackRange, enemyLayers);
 
         foreach(Collider2D player in hitPlayer){
-            Debug.Log("teste");
             player.GetComponent<PlayerCombat>().TakeDamage(attackDamage);
         }
     }
@@ -72,6 +74,9 @@ public class Enemy : MonoBehaviour
         GetComponent<Collider2D>().enabled = false;
         this.enabled = false;
         gameObject.SetActive(false);
+        if(isBoss){
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
     }
 
     void OnDrawGizmosSelected(){
